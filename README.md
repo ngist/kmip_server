@@ -24,9 +24,9 @@ https://kb.synology.com/en-global/DSM/tutorial/How_to_reset_my_Synology_NAS_7
 4. You have a security group setup that allows external access on port 5696 and port 22. 
 
 # How to use
-1. Modify the variables at the beginning of the init script to match your needs.
+1. Modify the variables at the beginning of the init script to match your needs. IMPORTANT: MAKE SURE YOU KNOW THE LUKS_PASSWORD
 2. Launch a new EC2 instance, I used t4g.nano and base image ami-088cedaa951dcc6a5, and supply the init_script.sh as the user-data/init_script make sure it's setup for dual stack IP or the DDNS won't work. 
-3. Once setup has finished download the cert_package.zip `sftp ec2-user@kmip.example.com:cert_package.zip ~/`
+3. Once setup has finished download the cert_package.zip `sftp ec2-user@kmip.example.com:/etc/cosmian/cert_package.zip ~/`
 4. Unzip the cert package and upload the certs to your NASes by default the script generates certs for two NASes but you can edit the `client=` to add as many as you need.
    - First import the client cert into the synology NAS Control Panel > Security > Certificates > Add
    - For description put in something useful like CosmianClient or KMIP_Client
@@ -41,6 +41,8 @@ https://kb.synology.com/en-global/DSM/tutorial/How_to_reset_my_Synology_NAS_7
 7. Open storage manager click your storage pool and open global settings
    a. Reset your vault and configure it to use KMIP. This will clear the keys from your local key vault.
 8. The client certs are only valid for 3 years, and the Root CA is valid for 10. You'll need to periodically refresh the ceets on your NAS to do this ssh into the EC2 instance run `./renew_certs.sh` and then redownload the cert package and distribute the certs. There's no built-in script for refreshing the Root CA, but you can copy from the init script every 10 years, assuming your still using this.
+9. OPTIONAL: Unmount the luks img, and make a backup.
+10. OPTIONAL: Follow https://www.reddit.com/r/synology/comments/1fe200i/how_to_setup_volume_encryption_with_remote_kmip/ to automatically unmount the luks volume and turn off the kmip server when not in use.
 
 # Troubleshooting:
 1. Did you skip step 5 above?
