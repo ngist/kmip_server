@@ -28,11 +28,11 @@ https://kb.synology.com/en-global/DSM/tutorial/How_to_reset_my_Synology_NAS_7
 2. Launch a new EC2 instance, I used t4g.nano and base image ami-088cedaa951dcc6a5, and supply the init_script.sh as the user-data/init_script make sure it's setup for dual stack IP or the DDNS won't work. 
 3. Once setup has finished download the cert_package.zip `sftp ec2-user@kmip.example.com:cert_package.zip ~/`
 4. Unzip the cert package and upload the certs to your NASes by default the script generates certs for two NASes but you can edit the `client=` to add as many as you need.
-  a. First import the client cert into the synology NAS Control Panel > Security > Certificates > Add
-  b. For description put in something useful like CosmianClient or KMIP_Client
-  c. For Private Key: upload nasX.key
-  d. For Certificate: upload nasX.crt
-  e. For Intermediate certificate: upload clients-ca.crt
+ - First import the client cert into the synology NAS Control Panel > Security > Certificates > Add
+ - For description put in something useful like CosmianClient or KMIP_Client
+ - For Private Key: upload nasX.key
+ - For Certificate: upload nasX.crt
+ - For Intermediate certificate: upload clients-ca.crt
 5. IMPORTANT: In the certificate manager click settings, and select the cert you just added for the KMIP service.
 6. Goto the KMIP tab and select "Set as remote key client"
    a. Set the hostname kmip.yourdomain.com
