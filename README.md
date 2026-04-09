@@ -43,7 +43,7 @@ https://kb.synology.com/en-global/DSM/tutorial/How_to_reset_my_Synology_NAS_7
 8. The client certs are only valid for 3 years, and the Root CA is valid for 10. You'll need to periodically refresh the ceets on your NAS to do this ssh into the EC2 instance run `./renew_certs.sh` and then redownload the cert package and distribute the certs. There's no built-in script for refreshing the Root CA, but you can copy from the init script every 10 years, assuming your still using this.
 
 # Troubleshooting:
-1. Did you skip step 4 above?
+1. Did you skip step 5 above?
 2. Check that DNS entries for your kmip are there and have the right IP.
 3. Did you setup a security group to allow access on port 5696 to your EC2 instance.
 4. Is the cosmian kms docker container running? Try `sudo docker ps` you should see something if not manually restart `sudo docker restart cosmian-kms`
