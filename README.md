@@ -40,7 +40,7 @@ If you use route53 for DNS this script will also act as a DDNS that runs at boot
    - upload clients-ca.crt for the Certificate Authority
 7. Open storage manager click your storage pool and open global settings
    a. Reset your vault and configure it to use KMIP. This will clear the keys from your local key vault.
-8. The client certs are only valid for 3 years, and the Root CA is valid for 10. You'll need to periodically refresh the ceets on your NAS to do this ssh into the EC2 instance run `./renew_certs.sh` and then redownload the cert package and distribute the certs. There's no built-in script for refreshing the Root CA, but you can copy from the init script every 10 years, assuming your still using this.
+8. The client certs are only valid for 3 years, and the Root CA is valid for 10. You'll need to periodically refresh the certs on your NAS to do this ssh into the EC2 instance run `./renew_certs.sh` and then redownload the cert package and distribute the certs. There's no built-in script for refreshing the Root CA, but you can copy from the init script every 10 years, assuming your still using this.
 9. Make a backup of your /opt/luks/vault.img
 10. I'd strongly recommend testing that everything is working, do a reboot of your NAS to make sure the volumes unlock, then shutdown the KMIP server, and reboot again to verify they are locked.
     
