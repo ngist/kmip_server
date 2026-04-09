@@ -8,9 +8,10 @@
 # https://docs.cosmian.com/key_management_system/integrations/storage/synology_dsm/
 # Generated based on https://www.reddit.com/r/synology/comments/1fe200i/how_to_setup_volume_encryption_with_remote_kmip/
 
-
+#Change these to match your needs
 ROOT_DOMAIN=example.com
 P12_PASSWORD=`openssl rand -base64 20`
+LUKS_PASSWORD=`openssl rand -base64 20`
 KMS_PATH=/etc/cosmian/kms
 ZONE_ID=Z1234EXAMPLE
 KEY_LENGTH=4096
@@ -19,6 +20,17 @@ dnf install -y docker
 systemctl start docker
 
 mkdir -p $KMS_PATH
+# Setup LUKS image to hold cosmian data
+cd /etc/cosmian
+dd if=/dev/zero of=vault.img bs=1M count=20
+echo $LUKS_PASSWORD | cryptsetup luksFormat vault.img -d -
+
+mkdir luks_mnt
+cryptsetup open --type luks vault.img myvault
+ls /dev/mapper/myvault
+mkfs.ext4 -L myvault /dev/mapper/myvault
+mount /dev/mapper/myvault /etc/cosmian/luks_mnt
+df
 
 # Generate config
 cat << EOF > /etc/cosmian/kms/kms.toml
@@ -133,5 +145,6 @@ systemctl start ddns.service
 
 sudo docker run --name cosmian-kms -d -p 9998:9998 -p 5696:5696 \
   -v /etc/cosmian/kms:/etc/cosmian/kms:ro \
+  -v /etc/cosmian/luks_mnt:/var/lib/cosmian-kms:rw \
   -e COSMIAN_KMS_CONF=/etc/cosmian/kms/kms.toml \
   ghcr.io/cosmian/kms:latest
