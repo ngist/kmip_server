@@ -26,7 +26,7 @@ dd if=/dev/zero of=vault.img bs=1M count=20
 echo $LUKS_PASSWORD | cryptsetup luksFormat vault.img -d -
 
 mkdir luks_mnt
-cryptsetup open --type luks vault.img myvault
+echo $LUKS_PASSWORD | cryptsetup open --type luks vault.img myvault
 ls /dev/mapper/myvault
 mkfs.ext4 -L myvault /dev/mapper/myvault
 mount /dev/mapper/myvault /etc/cosmian/luks_mnt
