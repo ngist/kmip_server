@@ -21,10 +21,10 @@ mkdir /opt/luks
 # Setup LUKS image to hold cosmian data
 cd /opt/luks
 dd if=/dev/zero of=vault.img bs=1M count=20
-echo $LUKS_PASSWORD | cryptsetup luksFormat vault.img -d -
+echo "$LUKS_PASSWORD" | sudo cryptsetup luksFormat --type luks2 vault.img -d -
 
 mkdir /etc/cosmian
-echo $LUKS_PASSWORD | cryptsetup open --type luks vault.img myvault
+echo "$LUKS_PASSWORD" | cryptsetup open vault.img myvault
 ls /dev/mapper/myvault
 mkfs.ext4 -L myvault /dev/mapper/myvault
 mount /dev/mapper/myvault /etc/cosmian/
