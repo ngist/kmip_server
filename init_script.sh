@@ -3,7 +3,7 @@
 # It uses CosmianKMS to act as the KMIP server, and provides a DDNS script to update IP address 
 # if the instance is rebooted without needing a static IP.
 # You'll need to add an IAM role with permissions to update the DNS entries. 
-# You'll need to download the certs for the NAS's ussing `sftp kmip.example.com:cert_package.zip ./OneDrive/Desktop`
+# You'll need to download the certs for the NAS's ussing `sftp kmip.example.com:/etc/cosmian/cert_package.zip ./OneDrive/Desktop`
 #References
 # https://docs.cosmian.com/key_management_system/integrations/storage/synology_dsm/
 # Generated based on https://www.reddit.com/r/synology/comments/1fe200i/how_to_setup_volume_encryption_with_remote_kmip/
