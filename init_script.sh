@@ -10,7 +10,7 @@
 
 #Change these to match your needs
 ROOT_DOMAIN=example.com
-LUKS_PASSWORD=`openssl rand -base64 20`
+LUKS_PASSWORD=`openssl rand -base64 21`
 ZONE_ID=Z1234EXAMPLE
 KEY_LENGTH=4096
 
@@ -35,7 +35,7 @@ mkdir /etc/cosmian/data
 KMS_PATH=/etc/cosmian/kms
 mkdir $KMS_PATH 
 
-P12_PASSWORD=`openssl rand -base64 20`
+P12_PASSWORD=`openssl rand -base64 21`
 # Generate config
 cat << EOF > /etc/cosmian/kms/kms.toml
 [tls]
