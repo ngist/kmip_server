@@ -152,3 +152,16 @@ sudo docker run --name cosmian-kms -d -p 9998:9998 -p 5696:5696 \
   -v /etc/cosmian/data:/var/lib/cosmian-kms:rw \
   -e COSMIAN_KMS_CONF=/etc/cosmian/kms/kms.toml \
   ghcr.io/cosmian/kms:latest
+
+cat << 'EOF' > /home/ec2-user/launch_kmip.sh
+#!/bin/bash
+# Mounts luks and starts KMIP for 10 minutes.
+echo $1 | cryptsetup open /opt/luks/vault.img myvault
+mount /dev/mapper/myvault /etc/cosmian
+docker start cosmian-kms
+sleep 600
+docker stop cosmian-kms
+umount /etc/cosmian
+cryptsetup close myvault
+EOF
+chmod +x /home/ec2-user/launch_kmip.sh
