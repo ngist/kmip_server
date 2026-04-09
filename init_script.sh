@@ -22,7 +22,7 @@ mkdir /opt/luks
 cd /opt/luks
 dd if=/dev/zero of=vault.img bs=1M count=20
 echo $LUKS_PASSWORD > /opt/luks/passphrase
-printf "$LUKS_PASSWORD\n" | cryptsetup luksFormat --type luks2 vault.img -d -
+printf $LUKS_PASSWORD | cryptsetup luksFormat --type luks2 vault.img
 
 mkdir /etc/cosmian
 echo $LUKS_PASSWORD | cryptsetup open vault.img myvault
