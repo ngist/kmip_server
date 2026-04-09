@@ -10,28 +10,32 @@
 
 #Change these to match your needs
 ROOT_DOMAIN=example.com
-P12_PASSWORD=`openssl rand -base64 20`
 LUKS_PASSWORD=`openssl rand -base64 20`
-KMS_PATH=/etc/cosmian/kms
 ZONE_ID=Z1234EXAMPLE
 KEY_LENGTH=4096
 
 dnf install -y docker
 systemctl start docker
 
-mkdir -p $KMS_PATH
+mkdir /opt/luks
 # Setup LUKS image to hold cosmian data
-cd /etc/cosmian
+cd /opt/luks
 dd if=/dev/zero of=vault.img bs=1M count=20
 echo $LUKS_PASSWORD | cryptsetup luksFormat vault.img -d -
 
-mkdir luks_mnt
+mkdir /etc/cosmian
 echo $LUKS_PASSWORD | cryptsetup open --type luks vault.img myvault
 ls /dev/mapper/myvault
 mkfs.ext4 -L myvault /dev/mapper/myvault
-mount /dev/mapper/myvault /etc/cosmian/luks_mnt
+mount /dev/mapper/myvault /etc/cosmian/
 df
 
+mkdir /etc/cosmian/data
+
+KMS_PATH=/etc/cosmian/kms
+mkdir $KMS_PATH 
+
+P12_PASSWORD=`openssl rand -base64 20`
 # Generate config
 cat << EOF > /etc/cosmian/kms/kms.toml
 [tls]
@@ -55,13 +59,13 @@ openssl req -new -x509 -days 3650 -key clients-ca.key \
   -subj "/CN=KMS Clients CA" -out clients-ca.crt
 
 # Renew Cert scripts
-echo "#!/bin/bash" > /home/ec2-user/renew_certs.sh
-echo "ROOT_DOMAIN=$ROOT_DOMAIN" > /home/ec2-user/renew_certs.sh
-echo "P12_PASSWORD=$P12_PASSWORD" >> /home/ec2-user/renew_certs.sh
-echo "KMS_PATH=$KMS_PATH" >> /home/ec2-user/renew_certs.sh
-echo "KEY_LENGTH=$KEY_LENGTH" >> /home/ec2-user/renew_certs.sh
-cat << 'EOF' >> /home/ec2-user/renew_certs.sh
-cd /home/ec2-user
+echo "#!/bin/bash" > /etc/cosmian/renew_certs.sh
+echo "ROOT_DOMAIN=$ROOT_DOMAIN" > /etc/cosmian/renew_certs.sh
+echo "P12_PASSWORD=$P12_PASSWORD" >> /etc/cosmian/renew_certs.sh
+echo "KMS_PATH=$KMS_PATH" >> /etc/cosmian/renew_certs.sh
+echo "KEY_LENGTH=$KEY_LENGTH" >> /etc/cosmian/renew_certs.sh
+cat << 'EOF' >> /etc/cosmian/renew_certs.sh
+cd /etc/cosmian/
 clients="nas nas2 kmip"
 for i in $clients; do 
   openssl genrsa -out $i.key $KEY_LENGTH
@@ -75,8 +79,8 @@ for i in $clients; do
 done
 openssl pkcs12 -export -out $KMS_PATH/server.p12 -inkey kmip.key -in kmip.crt --password pass:$P12_PASSWORD
 rm kmip.*
-cp $KMS_PATH/clients-ca.crt /home/ec2-user/clients-ca.crt
-zip cert_package.zip *.crt *.csr *.key
+cp $KMS_PATH/clients-ca.crt clients-ca.crt
+zip cert_package.zip *.crt *.key
 rm *.crt *.csr *.key
 EOF
 chmod +x /home/ec2-user/renew_certs.sh
@@ -145,6 +149,6 @@ systemctl start ddns.service
 
 sudo docker run --name cosmian-kms -d -p 9998:9998 -p 5696:5696 \
   -v /etc/cosmian/kms:/etc/cosmian/kms:ro \
-  -v /etc/cosmian/luks_mnt:/var/lib/cosmian-kms:rw \
+  -v /etc/cosmian/data:/var/lib/cosmian-kms:rw \
   -e COSMIAN_KMS_CONF=/etc/cosmian/kms/kms.toml \
   ghcr.io/cosmian/kms:latest
