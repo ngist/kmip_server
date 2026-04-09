@@ -83,7 +83,7 @@ cp $KMS_PATH/clients-ca.crt clients-ca.crt
 zip cert_package.zip *.crt *.key
 rm *.crt *.csr *.key
 EOF
-chmod +x /home/ec2-user/renew_certs.sh
+chmod +x /etc/cosmian/renew_certs.sh
 
 #Setup DDNS
 echo "#!/bin/bash" > /home/ec2-user/ddns.sh
@@ -145,7 +145,7 @@ systemctl daemon-reload
 systemctl enable ddns.service
 systemctl start ddns.service
 
-/home/ec2-user/renew_certs.sh
+/etc/cosmian/renew_certs.sh
 
 sudo docker run --name cosmian-kms -d -p 9998:9998 -p 5696:5696 \
   -v /etc/cosmian/kms:/etc/cosmian/kms:ro \
